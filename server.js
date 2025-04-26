@@ -12,6 +12,16 @@ import TurndownService   from "turndown";
 
 const PORT            = process.env.PORT ?? 3000;
 const turndown        = new TurndownService({ headingStyle: "atx" });
+//turndown.remove(
+//    [
+//        "script",
+//        "style",
+//        "head",
+//        "noscript",
+//        "template",
+//        "meta",
+//        "link"
+//    ]);
 let   browser         = null;
 
 /* ---------- Browser pool ---------- */
@@ -34,6 +44,33 @@ async function initBrowser()
                     "--disable-features=IsolateOrigins,site-per-process"
                 ]
         });
+}
+
+/* --- helper : return cleaned body innerHTML --- */
+async function getCleanBodyHtml(page)
+{
+    return await page.evaluate(() =>
+    {
+        // Remove noise elements
+        const selectors =
+            [
+                "script",
+                "style",
+                "noscript",
+                "template",
+                "link",
+                "meta",
+                "head"
+            ];
+
+        selectors.forEach(
+            (sel) =>
+            {
+                document.querySelectorAll(sel).forEach((el) => el.remove());
+            });
+
+        return document.body.innerHTML;   // head is gone, only visible DOM
+    });
 }
 
 /* ---------- HTML rendering ---------- */
@@ -63,7 +100,8 @@ async function renderHtml(targetUrl)
             timeout:   20000
         });
 
-    const html = await page.content();
+  //const html = await page.content();
+    const html = await getCleanBodyHtml(page); // cleaned HTML (without <head>, <style>, <script>, ...)
     await page.close();
     return html;
 }
