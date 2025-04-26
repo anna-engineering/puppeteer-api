@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-api",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Self-hosted prerender API (HTML or Markdown)",
   "main": "server.js",
   "type": "module",
