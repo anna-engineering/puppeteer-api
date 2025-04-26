@@ -9,9 +9,12 @@
 import express           from "express";
 import { launch }        from "puppeteer";
 import TurndownService   from "turndown";
+import { JSDOM }          from "jsdom";
+import { Readability }    from "@mozilla/readability";
 
 const PORT            = process.env.PORT ?? 3000;
 const turndown        = new TurndownService({ headingStyle: "atx" });
+//Dirty and fast solution:
 //turndown.remove(
 //    [
 //        "script",
@@ -113,6 +116,7 @@ app.get("/render", async (req, res) =>
 {
     const urlParam  = req.query.url;
     const format    = (req.query.format || "").toLowerCase();
+    const readable  = (req.query.readable || "").toLowerCase();
 
     if (!urlParam)
     {
@@ -138,6 +142,18 @@ app.get("/render", async (req, res) =>
     {
         await initBrowser();
         const html = await renderHtml(target.href);
+
+        if (readable === "true" || readable === "1" || readable === "yes" || readable === "on")
+        {
+            const dom       = new JSDOM(html, { url: target.href });
+            const reader    = new Readability(dom.window.document);
+            const article   = reader.parse();          // { title, content, textContent, … }
+            if (format === "md" || format === "markdown")
+            {
+                const md = turndown.turndown(article.content);
+                return res.type("text/markdown").send(md);
+            }
+        }
 
         // Conversion éventuelle en Markdown
         if (format === "md" || format === "markdown")
