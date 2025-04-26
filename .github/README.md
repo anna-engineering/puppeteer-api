@@ -5,6 +5,7 @@
 
 > **Lightweight self‑hosted service that extracts the _final DOM_ (HTML or Markdown) from JavaScript‑heavy pages using **Puppeteer**. Ideal for indexing, SEO prerendering, or server‑side scraping.  
 > Images, fonts, and CSS are skipped to lower latency and memory footprint.
+> An optional **Readability** mode keeps only the main article for even cleaner output.
 
 ---
 
@@ -32,6 +33,7 @@
 | ✔ | Returns either raw **HTML** or **Markdown** (`?format=md`) powered by **Turndown** |
 | ✔ | Filters images / CSS / media ⇒ shorter response time |
 | ✔ | Single shared Chromium instance ⇒ minimal startup overhead |
+| ✔ | Optional [Mozilla **Readability**](https://github.com/mozilla/readability) extraction for clutter‑free content |
 | ✔ | **Docker‑ready** image (< 300 MB) |
 | ✔ | `/health` endpoint for monitoring |
 | ✔ | Zero compile‑time deps: Node 20.x + Chromium system libs only |
@@ -70,10 +72,11 @@ docker run -p 3000:3000 --rm puppeteer-api
 
 ### `GET /render`
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `url`     | string | ✔ | Absolute URL (`http`\|`https`) to prerender |
-| `format`  | string | ✖ | `md` or `markdown` ⇒ returns Markdown; otherwise HTML (default) |
+| Parameter  | Type   | Required | Description |
+|------------|--------|----------|-------------|
+| `url`      | string | ✔ | Absolute URL (`http`\|`https`) to prerender |
+| `format`   | string | ✖ | `md` or `markdown` ⇒ returns Markdown; otherwise HTML (default) |
+| `readable` | string | ✖ | `yes`/`true`/`1`/`on` ⇒ run [Readability](https://github.com/mozilla/readability) to strip boilerplate before returning (works for both HTML & Markdown) |
 
 **Responses**
 
@@ -89,6 +92,9 @@ curl "http://localhost:3000/render?url=https://www.wikipedia.org/"
 
 # Markdown
 curl "http://localhost:3000/render?url=https://www.wikipedia.org/&format=md"
+
+# Markdown of the main article only
+curl "http://localhost:3000/render?url=https://blog.example.com/post42&format=md&readable=yes"
 ```
 
 ### `GET /health`
