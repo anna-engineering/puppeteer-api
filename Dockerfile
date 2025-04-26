@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 COPY package*.json ./
+
+# Use this command if "package-lock.json" is not present
+# RUN npm install --omit=dev
+# Otherwise, use this command:
 RUN npm ci --omit=dev
 
 COPY . .
