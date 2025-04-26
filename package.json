@@ -1,7 +1,7 @@
 {
   "name": "puppeteer-prerender-api",
-  "version": "1.0.0",
-  "description": "Small self-hosted prerender API using Puppeteer",
+  "version": "1.1.0",
+  "description": "Self-hosted prerender API (HTML or Markdown)",
   "main": "server.js",
   "type": "module",
   "scripts":
@@ -10,7 +10,8 @@
   },
   "dependencies":
   {
-    "express": "^4.19.2",
-    "puppeteer": "^22.0.0"
+    "express":  "^4.19.2",
+    "puppeteer": "^22.0.0",
+    "turndown":  "^7.1.2"
   }
 }
